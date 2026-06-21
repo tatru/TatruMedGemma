@@ -1,105 +1,144 @@
 # TatruMedGemma
 
-A multi‑connection medical assistant prototype created for the [Kaggle
-MedGemma Impact Challenge](https://www.kaggle.com/competitions/med-gemma-impact-challenge/overview).
-The codebase demonstrates on‑device, LAN and online inference with a
-privacy‑focused UI.
+TatruMedGemma is a research and demonstration prototype created for the
+[Kaggle MedGemma Impact Challenge](https://www.kaggle.com/competitions/med-gemma-impact-challenge/overview).
+It explores a privacy-aware mobile UX for medical-adjacent AI across
+on-device, LAN, and hosted inference modes.
 
-### _Note: Minor stability fixes were applied post-deadline (Feb 25) to ensure the live demo and repo remain functional for evaluation. No new features or model changes were introduced._
+> Medical safety disclaimer
+>
+> TatruMedGemma is a research and demonstration prototype. It is not a
+> medical device, not a diagnostic system, and not a substitute for
+> qualified medical advice, diagnosis, treatment, or emergency care.
+> Model outputs may be inaccurate, incomplete, biased, or unsafe. Do not
+> rely on this project for clinical decisions. Any medical or image-related
+> output must be reviewed by qualified professionals.
 
-## Key features
+The Kaggle challenge submission period is over. This repository remains
+public for learning, reproducibility, experimentation, and responsible
+open-source continuation. Minor stability fixes were applied after the
+challenge deadline on February 25, 2026 to keep the demo paths and repo
+usable; no claim is made that those post-deadline changes were part of
+Kaggle evaluation. See [Open Source Status](docs/OPEN-SOURCE-STATUS.md).
 
-- Text-based conversation with a medical‑domain LLM.
-- Analysis of medical images (X‑rays, MRIs) alongside text prompts.
-- Text‑to‑speech support for model responses.
-- Fully configurable guardrails and inference endpoints.
-- Three operating modes: **Offline** (local GGUF model), **LAN**
-  (Flask/Ollama), **Online** (Gradio demo).
-- Conversations never leave the device unless explicitly exported — no
-  backend storage.
-- Configurable download URLs for models (Hugging Face default).
-- Future roadmap: voice/audio input, enhanced download reliability.
+## What This Repository Contains
 
-## Distributed intelligence architecture
+- `TatruMedGemmaApp/`: Expo / React Native client with on-device, LAN,
+  Flask, and hosted Gradio routing.
+- `MedGemmaFlaskAPI/`: experimental Flask service for text and image
+  requests against MedGemma-style models.
+- `MedGemmaKaggleGradioAPI/`: Kaggle / Gradio notebook prototype used
+  during challenge work.
+- `TatruMedGemmaApp/guardrails/`: example manifest and schema scaffolding
+  for non-clinical guardrails experiments.
 
-TatruMedGemma is built on a three‑tiered distributed design that lets
-users choose the right balance of privacy, power, and availability.
+## Quick Start
 
-### Tier 1: Privacy‑First Edge (On‑Device)
-- **Model:** MedGemma 1.5 4B (quantized)
-- **Engine:** Ollama Mobile Runtime
-- **Scope:** Text‑only triage
-- **Value:** Zero‑latency, 100 % offline. Ensures that basic medical
-  guidance is available even in regions with no internet connectivity.
+### 1. Clone the repository
 
-### Tier 2: Clinical Resource Layer (LAN)
-- **Models:** MedGemma 1.5 4B & 27 B
-- **Engines:** Ollama (text) & Flask/Transformers (multimodal)
-- **Scope:** Enhanced text & image analysis
-- **Value:** Leverages local high‑performance workstations within a
-  hospital’s secure Wi‑Fi. Keeps sensitive patient imagery (X‑rays,
-  dermoscopy) inside the institutional firewall while providing 27B
-  reasoning power.
-
-### Tier 3: Global Scale Layer (Public Cloud)
-- **Models:** MedGemma 1.5 4B & 27 B (quantized NF4)
-- **Engines:** Hugging Face Spaces / Kaggle API
-- **Scope:** Full multimodal reasoning
-- **Value:** Offers a highly‑available “brain” for remote practitioners.
-  NF4 quantization delivers 27B performance on accessible cloud
-  hardware, ensuring no doctor is limited by their local equipment.
-
-## Why this project?
-Designed as a rapid prototype for the Kaggle competition, TatruMedGemma
-showcases a hybrid architecture that keeps sensitive data in the user’s
-control while still allowing cloud‑based experimentation. It also
-provides quantization notebooks, a Flask API, and an Expo‑based mobile
-app with native prebuilds.
-
-
-
-## Quick start
-
-### 1. Clone repository
 ```sh
-git clone https://github.com/<your-org>/TatruMedGemma.git
+git clone https://github.com/tatru/TatruMedGemma.git
 cd TatruMedGemma
 ```
 
-### 2. Prerequisites
-- **Conda environment (`medgemma2`)** with Python 3.10 (see
-  `requirements-api.txt`).
-- **Ollama** for LAN mode: `ollama pull MedAIBase/MedGemma1.5:4b-it`.
-- Expo CLI and Android/iOS tooling for mobile front end.
+### 2. Run the Expo app
 
-### 3. Running the system
+```sh
+cd TatruMedGemmaApp
+npm install
+npx expo start
+```
 
-#### Offline device mode
-1. In `TatruMedGemmaApp`, install npm packages and run the app
-   (`npx expo start`).
-2. In settings, download a GGUF model or supply your own URL.
-3. Switch inference provider to **Device** and pick fast/balanced/quality
-   mode.
+Open the app in a development build, simulator, emulator, or Expo tooling
+appropriate for your platform.
 
-#### LAN mode (Flask + Ollama)
+### 3. Choose an inference mode
+
+- `On-device`: download a GGUF model from a URL you control and run the
+  text-only device provider locally.
+- `LAN`: point the app at your own Ollama or Flask server on your network.
+- `Hosted`: point the app at your own OpenAI-compatible API or hosted
+  Gradio endpoint.
+
+### 4. Optional LAN / Flask setup
+
+Ollama example:
+
+```sh
+ollama pull MedAIBase/MedGemma1.5:4b
+```
+
+Flask example:
+
 ```sh
 cd MedGemmaFlaskAPI
-LOCAL_MODEL_DIR=./quant-medgemma python api_stable.py
+conda activate medgemma2
+python api_stable.py
 ```
-Point the mobile/web client at `http://<hostname>:5000`.
 
-#### Online prototype
-Open the Kaggle notebook linked above or run `MedGemmaFlaskAPI/api.py`
-against an online model.
+Configure the corresponding URL in the app settings before use.
 
-## Development notes
-- Quantization workflow resides in
-  `MedGemmaFlaskAPI/MedGemma v2.ipynb`.
-- Mobile/native code is under `TatruMedGemmaApp`; the llama binding lives
-  in `services/inference/providers/deviceProvider.ts`.
-- Guardrail configuration helpers are located in
-  `TatruMedGemmaApp/services/guardrails`.
+## Inference Modes And Data Flow
 
-## Privacy
-All conversation data stays locally on the device; nothing is sent to any
-For developer setup and the full Conda package list, see [CONDA_SETUP.md](CONDA_SETUP.md). For detailed privacy practices, see [PRIVACY.md](PRIVACY.md).
+| Mode | Typical provider | Where prompts and images go |
+| --- | --- | --- |
+| On-device | `llama.rn` with GGUF files | Prompt text stays on the device during inference. Model downloads still come from the configured URL. The current device provider is text-only. |
+| LAN | Ollama, Flask, optional MedSigLIP | Prompts and any attached images are sent to the user-configured LAN server(s). Logs, retention, and security depend on your server and network setup. |
+| Hosted / online | OpenAI-compatible API, Gradio / Kaggle endpoint | Prompts and images may leave the device and pass through third-party infrastructure. Review provider terms, logs, telemetry, and retention before use. |
+
+The repository does not include a backend conversation store. However, the
+current app does persist chat history, endpoint settings, and model
+configuration locally on the device. External providers and servers may log
+or retain data independently of this repo. See [PRIVACY.md](PRIVACY.md).
+
+## Responsible Use
+
+- Do not use this project for diagnosis, treatment, prescribing,
+  medication dosing, emergency care, or clinical decision-making.
+- Do not use it as an unsupervised patient-facing system.
+- Do not present image outputs as clinically reliable interpretations.
+- Do not use real patient data in public demos, sample issues, screenshots,
+  or pull requests.
+- Do not upload identifiable medical images unless you have legal authority,
+  patient consent where required, and appropriate security safeguards.
+- Do not claim accuracy, clinical validation, regulatory approval,
+  HIPAA/GDPR compliance, or fitness for healthcare deployment.
+
+## Model And License Responsibility
+
+This repository currently references or demonstrates the following upstream
+artifacts and endpoints:
+
+- Hugging Face GGUF downloads:
+  `https://huggingface.co/unsloth/medgemma-4b-it-GGUF`
+- Hugging Face / Transformers model ID:
+  `google/medgemma-1.5-4b-it`
+- Ollama model example:
+  `MedAIBase/MedGemma1.5:4b`
+- Guardrails manifest example:
+  `TatruMedGemmaApp/guardrails/manifest.example.json`
+- Hosted Gradio / Kaggle endpoints:
+  user supplied in app settings
+- Hosted OpenAI-compatible endpoints:
+  user supplied in app settings
+- Optional MedSigLIP / MedASR endpoints:
+  user supplied in app settings
+
+The repository license does not grant rights to Google Gemma / MedGemma
+weights, tokenizer files, Hugging Face-hosted artifacts, Ollama-served
+models, Gradio-hosted demos, or any third-party API. Those remain subject
+to their own licenses, acceptable-use policies, access terms, and model
+cards. If you want a local model directory such as
+`MedGemmaFlaskAPI/quant-medgemma/`, populate it yourself from upstream
+sources you are allowed to use.
+
+## Additional Documentation
+
+- [Safety](docs/SAFETY.md)
+- [Privacy](PRIVACY.md)
+- [Security](SECURITY.md)
+- [Contributing](CONTRIBUTING.md)
+- [Third-Party Notices](THIRD-PARTY-NOTICES.md)
+- [Open Source Status](docs/OPEN-SOURCE-STATUS.md)
+- [Offline Notes](OFFLINE.md)
+- [Conda Setup](CONDA_SETUP.md)

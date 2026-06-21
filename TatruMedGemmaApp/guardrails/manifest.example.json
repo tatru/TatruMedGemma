@@ -1,13 +1,13 @@
 {
   "manifestVersion": 1,
-  "project": "GemmaMed-help-guardrails",
+  "project": "tatru-medgemma-guardrails-example",
   "releasedAt": "2026-02-21T12:00:00Z",
   "environment": "example",
   "tenant": "default",
   "minAppVersion": "1.0.0",
   "recommendedAppVersion": "1.2.0",
   "locale": "en-US",
-  "notes": "Lightweight example manifest: self-contained guardrails (no external DB bundles) plus inline policy and system prompt. Useful for demos and local testing.",
+  "notes": "Example guardrails manifest for research/demo use. Keeps inline policy and prompt content non-clinical and self-contained for local testing.",
   "compatibility": {
     "minSchemaVersion": "2026.02",
     "maxSchemaVersion": "2027.12"
@@ -28,41 +28,41 @@
     "defaultDecision": "review",
     "rules": [
       {
-        "id": "clinical-avoid-prescriptions",
-        "description": "Disallow providing prescriptions or dosing instructions. Provide general guidance and advise clinician contact.",
-        "matchTopics": ["medications","prescription","dosing"],
+        "id": "avoid-prescriptions",
+        "description": "Disallow prescriptions or dosing instructions. Offer general educational information and direct the user to a licensed clinician or pharmacist.",
+        "matchTopics": ["medications", "prescription", "dosing"],
         "decision": "deny",
-        "exampleResponse": "I can't provide prescriptions or dosing. Please consult a licensed clinician for prescribing and dosing guidance."
+        "exampleResponse": "I cannot provide prescriptions or dosing instructions. Please consult a licensed clinician or pharmacist for medication decisions."
       },
       {
-        "id": "red-flags-triage",
-        "description": "If user mentions red-flag symptoms, escalate to urgent care recommendation.",
-        "matchTopics": ["chest pain","severe bleeding","difficulty breathing","unconscious"],
+        "id": "urgent-human-review",
+        "description": "If the user mentions potentially dangerous symptoms, recommend immediate local emergency services or urgent in-person care rather than self-management.",
+        "matchTopics": ["chest pain", "severe bleeding", "difficulty breathing", "unconscious"],
         "decision": "requireEscalation",
-        "exampleResponse": "These symptoms can be serious. If someone is experiencing them, seek emergency care or call your local emergency number immediately."
+        "exampleResponse": "Those symptoms may be serious. Seek local emergency care or contact your local emergency number immediately."
       },
       {
-        "id": "sensitive-info",
-        "description": "Avoid giving definitive diagnoses; encourage further evaluation.",
-        "matchTopics": ["diagnosis","definitive diagnosis","confirm"],
+        "id": "no-definitive-diagnosis",
+        "description": "Avoid definitive diagnosis or claims of clinical certainty.",
+        "matchTopics": ["diagnosis", "definitive diagnosis", "confirm"],
         "decision": "caution",
-        "exampleResponse": "I can help with possible causes and next steps, but I can't provide a definitive diagnosis. Consider reaching out to a healthcare professional for a formal assessment."
+        "exampleResponse": "I can offer general educational possibilities, but I cannot provide a definitive diagnosis. Please consult a qualified medical professional."
       }
     ]
   },
   "promptPackInline": {
     "templateKey": "medgemma_light_system",
-    "systemPrompt": "You are MedGemma — a clinical assistant that provides safe, conservative, and non-prescriptive guidance. Always prioritize patient safety: flag red flags, avoid prescribing medications, and recommend escalation when appropriate. Be concise and cite when appropriate.",
+    "systemPrompt": "You are an experimental medical information assistant prototype. Provide general educational information only, state uncertainty clearly, avoid diagnosis, treatment, prescribing, or emergency triage instructions, and recommend qualified professional review for medical concerns.",
     "userPromptExamples": [
       {
-        "id": "triage-example",
+        "id": "urgent-example",
         "user": "I've had chest pain and shortness of breath for 30 minutes",
-        "assistant": "Those could be signs of a serious problem. Please seek emergency care immediately."
+        "assistant": "Those symptoms may be serious. Seek local emergency care immediately and contact your local emergency number."
       },
       {
         "id": "meds-example",
         "user": "What dose of drug X should I take?",
-        "assistant": "I can't provide dosing or prescribing advice. Please consult your prescriber or pharmacist. I can offer general information about the medication's common uses and side effects."
+        "assistant": "I cannot provide dosing or prescribing advice. Please consult your prescriber or pharmacist. I can offer general educational information about common uses and side effects."
       }
     ]
   },

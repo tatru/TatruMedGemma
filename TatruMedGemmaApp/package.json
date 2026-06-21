@@ -1,14 +1,26 @@
 {
   "name": "tatru-medgemma-app",
+  "description": "Research/demo Expo client for the TatruMedGemma repository",
   "main": "expo-router/entry",
   "version": "1.0.0",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/tatru/TatruMedGemma.git",
+    "directory": "TatruMedGemmaApp"
+  },
+  "homepage": "https://github.com/tatru/TatruMedGemma",
+  "bugs": {
+    "url": "https://github.com/tatru/TatruMedGemma/issues"
+  },
   "scripts": {
     "start": "expo start",
     "reset-project": "node ./scripts/reset-project.js",
     "android": "expo run:android",
     "ios": "expo run:ios",
     "web": "expo start --web",
-    "lint": "expo lint"
+    "lint": "expo lint",
+    "sbom": "node -e \"require('fs').mkdirSync('compliance/sbom',{recursive:true})\" && npx --yes @cyclonedx/cyclonedx-npm@5.0.0 --output-format JSON --output-file compliance/sbom/tatru-medgemma.cdx.json"
   },
   "dependencies": {
     "@expo/vector-icons": "^15.0.3",

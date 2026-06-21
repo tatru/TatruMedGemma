@@ -81,7 +81,7 @@ export const InputArea: React.FC<InputAreaProps> = ({
     >
       {!!selectedImageUri && (
         <View style={styles.attachmentRow}>
-          <Text style={styles.attachmentText}>Image attached</Text>
+          <Text style={styles.attachmentText}>Image attached for experimental review</Text>
           <View style={styles.attachmentActions}>
             {!!onAnalyzeImage && (
               <TouchableOpacity
@@ -90,7 +90,7 @@ export const InputArea: React.FC<InputAreaProps> = ({
                 style={styles.attachmentAnalyzeButton}
               >
                 <Text style={styles.attachmentAnalyzeText}>
-                  {analyzingImage ? 'Analyzing...' : 'Analyze Image'}
+                  {analyzingImage ? 'Drafting...' : 'Draft Notes'}
                 </Text>
               </TouchableOpacity>
             )}
@@ -115,7 +115,7 @@ export const InputArea: React.FC<InputAreaProps> = ({
         
         <TextInput
           style={styles.input}
-          placeholder="Type a message..."
+          placeholder="Ask a question or describe the image..."
           value={text}
           onChangeText={setText}
           multiline

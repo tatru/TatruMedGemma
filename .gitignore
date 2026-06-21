@@ -42,6 +42,6 @@ yarn-error.*
 TatruMedGemmaApp/ios
 TatruMedGemmaApp/android
 
-# MedGemmaFlaskAPI quant model
+# User-supplied local model artifacts for Flask experiments
 MedGemmaFlaskAPI/quant-medgemma/
 .github/

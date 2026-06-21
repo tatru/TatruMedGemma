@@ -1,6 +1,5 @@
 """
-MedGemma Flask API - X-ray Analysis Service
-This API provides endpoints to analyze medical X-ray images using the MedGemma model.
+TatruMedGemma experimental Flask API for research/demo image description.
 """
 
 from flask import Flask, request, jsonify
@@ -24,6 +23,12 @@ CORS(app)  # Enable CORS for all routes (needed for Expo Go app)
 model = None
 processor = None
 device = None
+
+API_NAME = "MedGemma Experimental Image Description API"
+DEFAULT_PROMPT = (
+    "Describe this medical image for research/demo use. Do not provide a diagnosis "
+    "or treatment recommendation."
+)
 
 def load_model():
     """Load the MedGemma model and processor once at startup"""
@@ -58,16 +63,16 @@ def load_model():
         logger.error(f"Error loading model: {e}")
         raise
 
-def analyze_image(image: Image.Image, prompt: str = "Describe this X-ray") -> str:
+def analyze_image(image: Image.Image, prompt: str = DEFAULT_PROMPT) -> str:
     """
-    Analyze an X-ray image using the MedGemma model
+    Generate an experimental description for an image using the MedGemma model
     
     Args:
         image: PIL Image object
         prompt: Text prompt for the analysis
         
     Returns:
-        Generated description of the X-ray
+        Generated description text
     """
     try:
         messages = [
@@ -125,12 +130,12 @@ def health_check():
 @app.route('/analyze', methods=['POST'])
 def analyze_xray():
     """
-    Analyze an X-ray image
+    Analyze an image for research/demo use
     
     Expected request format:
     - Content-Type: multipart/form-data
     - image: image file (required)
-    - prompt: custom prompt text (optional, defaults to "Describe this X-ray")
+    - prompt: custom prompt text (optional)
     
     Or:
     - Content-Type: application/json
@@ -146,7 +151,7 @@ def analyze_xray():
             return jsonify({"error": "Model not loaded"}), 500
         
         # Get custom prompt if provided
-        prompt = request.form.get('prompt', 'Describe this X-ray') if request.form else None
+        prompt = request.form.get('prompt', DEFAULT_PROMPT) if request.form else None
         
         # Handle different input formats
         if 'image' in request.files:
@@ -163,7 +168,7 @@ def analyze_xray():
             if 'image_base64' not in data:
                 return jsonify({"error": "No image_base64 provided in JSON"}), 400
             
-            prompt = data.get('prompt', 'Describe this X-ray')
+            prompt = data.get('prompt', DEFAULT_PROMPT)
             
             # Decode base64 image
             image_data = base64.b64decode(data['image_base64'])
@@ -172,7 +177,10 @@ def analyze_xray():
             return jsonify({"error": "Invalid request format. Use multipart/form-data or application/json"}), 400
         
         # Analyze the image
-        logger.info(f"Analyzing image with prompt: {prompt}")
+        logger.info(
+            "Processing image analysis request (prompt_chars=%s)",
+            len(prompt or ""),
+        )
         description = analyze_image(image, prompt)
         
         return jsonify({
@@ -189,12 +197,12 @@ def analyze_xray():
 def root():
     """Root endpoint with API information"""
     return jsonify({
-        "name": "MedGemma X-ray Analysis API",
+        "name": API_NAME,
         "version": "1.0.0",
         "endpoints": {
             "GET /": "API information",
             "GET /health": "Health check",
-            "POST /analyze": "Analyze X-ray image"
+            "POST /analyze": "Experimental image description"
         },
         "documentation": {
             "/analyze": {
@@ -202,7 +210,7 @@ def root():
                 "content_types": ["multipart/form-data", "application/json"],
                 "parameters": {
                     "image": "Image file (multipart) or image_base64 (JSON)",
-                    "prompt": "Optional custom prompt (default: 'Describe this X-ray')"
+                    "prompt": "Optional custom prompt"
                 }
             }
         }

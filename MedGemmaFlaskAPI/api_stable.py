@@ -1,5 +1,5 @@
 """
-MedGemma Flask API - X-ray Analysis Service (Alternative Version)
+TatruMedGemma experimental Flask API (stable variant)
 This version loads the entire model to GPU without automatic device mapping,
 which can be more stable for API serving if you have enough VRAM.
 """
@@ -39,6 +39,12 @@ CORS(app)  # Enable CORS for all routes (needed for Expo Go app)
 # Global variables for model and processor
 model = None
 processor = None
+
+API_NAME = "MedGemma Experimental Image Description API"
+DEFAULT_PROMPT = (
+    "Describe this medical image for research/demo use. Do not provide a diagnosis "
+    "or treatment recommendation."
+)
 
 
 def get_runtime_device() -> torch.device:
@@ -123,16 +129,16 @@ def load_model():
         logger.error("Error loading model: %s", e)
         raise
 
-def analyze_image(image: Image.Image | None = None, prompt: str = "Describe this X-ray") -> str:
+def analyze_image(image: Image.Image | None = None, prompt: str = DEFAULT_PROMPT) -> str:
     """
-    Analyze an X-ray image using the MedGemma model
+    Generate an experimental description for an image using the MedGemma model
     
     Args:
         image: PIL Image object
         prompt: Text prompt for the analysis
         
     Returns:
-        Generated description of the X-ray
+        Generated description text
     """
     content = [{"type": "text", "text": prompt}]
     if image is not None:
@@ -166,7 +172,7 @@ def analyze_image(image: Image.Image | None = None, prompt: str = "Describe this
     return decoded
 
 
-def analyze_image_stream(image: Image.Image | None = None, prompt: str = "Describe this X-ray"):
+def analyze_image_stream(image: Image.Image | None = None, prompt: str = DEFAULT_PROMPT):
     """
     Generator that yields tokens from the MedGemma model as they are produced.
     Suitable for use with a streaming Flask response.
@@ -264,12 +270,12 @@ def health_check():
 @app.route('/analyze', methods=['POST'])
 def analyze_xray():
     """
-    Analyze an X-ray image or text-only prompt
+    Analyze an image or text-only prompt for research/demo use
     
     Expected request format:
     - Content-Type: multipart/form-data
     - image: image file (optional)
-    - prompt: custom prompt text (optional, defaults to "Describe this X-ray")
+    - prompt: custom prompt text (optional)
     
     Or:
     - Content-Type: application/json
@@ -284,7 +290,7 @@ def analyze_xray():
         if model is None or processor is None:
             return jsonify({"error": "Model not loaded"}), 500
         
-        prompt = 'Describe this X-ray'
+        prompt = DEFAULT_PROMPT
         image = None
         
         # Handle different input formats
@@ -310,7 +316,11 @@ def analyze_xray():
             return jsonify({"error": "Invalid request format. Use multipart/form-data or application/json"}), 400
         
         # Analyze the image
-        logger.info(f"Analyzing image with prompt: '{prompt}'")
+        logger.info(
+            "Processing analysis request (input_type=%s, prompt_chars=%s)",
+            "image+text" if image is not None else "text",
+            len(prompt or ""),
+        )
         description = analyze_image(image, prompt)
         logger.info("Analysis complete")
         
@@ -345,7 +355,7 @@ def analyze_xray_stream():
         logger.debug("files keys: %s", list(request.files.keys()))
         logger.debug("is_json: %s", request.is_json)
 
-        prompt = 'Describe this X-ray'
+        prompt = DEFAULT_PROMPT
         image = None
 
         if 'image' in request.files:
@@ -374,9 +384,9 @@ def analyze_xray_stream():
             }), 400
 
         logger.info(
-            "Streaming analysis with prompt: '%s' (input_type=%s)",
-            prompt,
-            "image+text" if image is not None else "text"
+            "Streaming analysis request (input_type=%s, prompt_chars=%s)",
+            "image+text" if image is not None else "text",
+            len(prompt or ""),
         )
         gen = analyze_image_stream(image, prompt)
         return Response(
@@ -396,13 +406,13 @@ def analyze_xray_stream():
 def root():
     """Root endpoint with API information"""
     return jsonify({
-        "name": "MedGemma X-ray Analysis API",
+        "name": API_NAME,
         "version": "1.1.0",
         "endpoints": {
             "GET /": "API information",
             "GET /health": "Health check",
-            "POST /analyze": "Analyze X-ray image",
-            "POST /analyze_stream": "Streamed X-ray analysis (token-by-token)"
+            "POST /analyze": "Experimental image description",
+            "POST /analyze_stream": "Streamed experimental image description"
         },
         "documentation": {
             "/analyze": {
@@ -410,7 +420,7 @@ def root():
                 "content_types": ["multipart/form-data", "application/json"],
                 "parameters": {
                     "image": "Optional image file (multipart) or image_base64 (JSON)",
-                    "prompt": "Optional custom prompt (default: 'Describe this X-ray')"
+                    "prompt": "Optional custom prompt"
                 }
             },
             "/analyze_stream": {

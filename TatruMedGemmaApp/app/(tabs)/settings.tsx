@@ -103,9 +103,7 @@ export default function SettingsScreen() {
   // fetch total memory once on mount
   React.useEffect(() => {
     const pc = (NativeModules as any)?.PlatformConstants;
-    console.log('PlatformConstants object', pc);
     const mem = pc?.totalMemory;
-    console.log('totalMemory raw value', mem);
     setDeviceTotalMemRaw(mem);
     if (typeof mem === 'number') {
       setDeviceTotalMem(mem);
@@ -123,7 +121,7 @@ export default function SettingsScreen() {
       const gb = (deviceTotalMem / (1024 ** 3)).toFixed(1);
       Alert.alert(
         'Low device memory',
-        `This phone only has about ${gb} GB of RAM; on-device inference may fail or be very slow. ` +
+        `This phone only has about ${gb} GB of RAM; on-device inference may fail or be very slow. ` +
           'Consider using LAN or cloud mode instead.',
         [{ text: 'OK', onPress: () => setShowMemoryAlert(true) }]
       );
@@ -135,7 +133,7 @@ export default function SettingsScreen() {
     if (draftMode === 'device' && Platform.OS === 'web') {
       Alert.alert(
         'Not supported on web',
-        'On-device inference is disabled in the web version of the app, but you can use Ollama or the Python Flask server in your device and connect as http://localhost',
+        'On-device inference is disabled in the web version of the app. Use a LAN or hosted endpoint instead.',
         [{ text: 'OK' }]
       );
     }
@@ -587,6 +585,9 @@ export default function SettingsScreen() {
                 );
               })}
             </View>
+            <Text style={styles.helperText}>
+              Mode controls where prompts and images go. On-device keeps inference local, LAN sends data to your own server, and hosted modes send data to configured third-party infrastructure.
+            </Text>
 
             {/* LAN, Cloud, MedSigLIP, MedASR settings */}
             <Text style={styles.sectionTitle}>On-device (GGUF)</Text>
@@ -602,7 +603,7 @@ export default function SettingsScreen() {
             {deviceTotalMem !== null && (
               <>
                 <Text style={styles.helperText}>
-                  Device RAM: {(deviceTotalMem / (1024 ** 3)).toFixed(1)} GB
+                  Device RAM: {(deviceTotalMem / (1024 ** 3)).toFixed(1)} GB
                 </Text>
                 {deviceTotalMemRaw != null && (
                   <Text style={styles.helperText}>
@@ -612,7 +613,7 @@ export default function SettingsScreen() {
               </>
             )}
             {deviceTotalMem !== null && deviceTotalMem < DEVICE_MIN_TOTAL_MEMORY_BYTES && (
-              <Text style={[styles.helperText, { color: '#d00' }]}>⚠️ Low memory – on-device inference may not work. Consider LAN/cloud.</Text>
+              <Text style={[styles.helperText, { color: '#d00' }]}>Low memory: on-device inference may not work. Consider LAN or hosted modes.</Text>
             )}
             <Text style={styles.fieldLabel}>GGUF Download URL</Text>
             <TextInput
@@ -656,7 +657,7 @@ export default function SettingsScreen() {
               />
             </View>
             <Text style={styles.helperText}>
-              Public, direct URLs are easiest for mobile download. Hugging Face resolve links work well for no-login access.
+              Public, direct URLs are easiest for mobile download. Downloaded model files stay on the device, but the model source and license remain upstream.
             </Text>
 
             <Text style={styles.sectionTitle}>LAN (Ollama)</Text>
@@ -669,6 +670,9 @@ export default function SettingsScreen() {
               autoCorrect={false}
               placeholder="http://192.168.50.21:11434"
             />
+            <Text style={styles.helperText}>
+              Prompts and attached images are sent to the LAN server you configure here. Replace this example URL with your own reachable host or device IP.
+            </Text>
             <Text style={styles.fieldLabel}>Model</Text>
             <TouchableOpacity
               style={styles.dropdownTrigger}
@@ -723,7 +727,7 @@ export default function SettingsScreen() {
                   />
 
                   {lanModels.length === 0 ? (
-                    <Text style={styles.dropdownEmptyText}>No loaded tags yet. Tap “Load from Ollama”.</Text>
+                    <Text style={styles.dropdownEmptyText}>No loaded tags yet. Tap Load from Ollama.</Text>
                   ) : (
                     <FlatList
                       data={filteredLanModels}
@@ -792,7 +796,7 @@ export default function SettingsScreen() {
               onChangeText={setCloudBaseUrl}
               autoCapitalize="none"
               autoCorrect={false}
-              placeholder="https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent"
+              placeholder="https://your-openai-compatible-endpoint.example/v1"
             />
             <Text style={styles.fieldLabel}>Model</Text>
             <TextInput
@@ -801,7 +805,7 @@ export default function SettingsScreen() {
               onChangeText={setCloudModel}
               autoCapitalize="none"
               autoCorrect={false}
-              placeholder="gemini-2.5-flash"
+              placeholder="gpt-4.1-mini"
             />
             <Text style={styles.fieldLabel}>API Key</Text>
             <TextInput
@@ -813,6 +817,9 @@ export default function SettingsScreen() {
               placeholder="sk-..."
               secureTextEntry
             />
+            <Text style={styles.helperText}>
+              Hosted API mode sends prompts and optional images off-device. Review provider terms, logs, retention, and security before use.
+            </Text>
 
             <Text style={styles.sectionTitle}>Flask API</Text>
             <Text style={styles.fieldLabel}>Base URL</Text>
@@ -836,8 +843,11 @@ export default function SettingsScreen() {
               </TouchableOpacity>
               {!!flaskTestResult && <Text style={styles.testResultText}>{flaskTestResult}</Text>}
             </View>
+            <Text style={styles.helperText}>
+              Flask mode sends prompts and optional images to the configured server. Do not expose a Flask endpoint on an untrusted network without your own protections.
+            </Text>
 
-            <Text style={styles.sectionTitle}>Kaggle Space (Gradio)</Text>
+            <Text style={styles.sectionTitle}>Hosted Gradio / Kaggle Space</Text>
             <Text style={styles.fieldLabel}>Gradio URL</Text>
             <TextInput
               style={styles.input}
@@ -848,7 +858,7 @@ export default function SettingsScreen() {
               placeholder="https://abc123.gradio.live"
             />
             <Text style={styles.helperText}>
-              {'Public Gradio URL from your Kaggle Space (Running tab). The Space function must accept (text: str, image: Image | None).'}
+              {'Prompts and optional images are sent to this hosted endpoint. Use a public Gradio URL you control, and review third-party retention and logging before use.'}
             </Text>
             <View style={styles.inlineActions}>
               <TouchableOpacity
@@ -868,6 +878,9 @@ export default function SettingsScreen() {
               <Text style={styles.fieldLabel}>Enable Image Analyzer Routing</Text>
               <Switch value={medsiglipEnabled} onValueChange={setMedsiglipEnabled} />
             </View>
+            <Text style={styles.helperText}>
+              When enabled, the latest image and prompt are sent to this analyzer service. Treat the returned text as experimental and non-clinical.
+            </Text>
             <Text style={styles.fieldLabel}>Base URL</Text>
             <TextInput
               style={styles.input}
@@ -901,6 +914,9 @@ export default function SettingsScreen() {
               <Text style={styles.fieldLabel}>Enable MedASR Routing</Text>
               <Switch value={medasrEnabled} onValueChange={setMedasrEnabled} />
             </View>
+            <Text style={styles.helperText}>
+              MedASR settings are stored locally, but end-to-end runtime use in this prototype requires additional code review.
+            </Text>
             <Text style={styles.fieldLabel}>Base URL</Text>
             <TextInput
               style={styles.input}
@@ -1141,7 +1157,7 @@ export default function SettingsScreen() {
               onChangeText={setPromptLabel}
               autoCapitalize="sentences"
               autoCorrect={false}
-              placeholder="e.g. Safety prompt with stricter triage escalation"
+              placeholder="e.g. Safety prompt with stricter escalation guidance"
             />
             <TextInput
               style={styles.input}

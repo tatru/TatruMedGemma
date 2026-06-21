@@ -1,60 +1,51 @@
-# Guardrails Data Layer (Offline-First)
+# Guardrails Data Layer
 
-This folder defines a practical baseline for local medical guardrails in the app.
+This folder contains example guardrails scaffolding for TatruMedGemma's
+research/demo workflow. It is not a clinical rules engine.
 
-## Included in this scaffold
+## Included Here
 
-- `schema.sql`: SQLite schema for triage guardrails, topic boundaries, and medication safety.
-- `manifest.example.json`: versioned and signed update contract for pulling DB bundles from your own server.
-- `../types/guardrails.ts`: TypeScript types for update manifests.
-- `../services/guardrails/updateService.ts`: fetch + validate + update-planning service scaffold.
+- `schema.sql`: SQLite schema for topic boundaries, escalation rules, and
+  medication-related guardrails experiments
+- `manifest.example.json`: example update contract for user-controlled
+  manifest hosting
+- `../types/guardrails.ts`: TypeScript types for manifest payloads
+- `../services/guardrails/updateService.ts`: manifest fetch and validation
+  scaffolding
 
-## Why this structure
+## Design Intent
 
-The schema is designed around safety layers:
+The schema is organized around:
 
-1. **Scope control**
-   - `allowed_topics` (`is_allowed` allow/deny flag), `topic_condition_links`
-2. **Medical grounding**
-   - `conditions`, `symptoms`, `condition_symptom_links`, `guidance_snippets`
-3. **High-risk checks**
-   - `red_flags`, `triage_rules`
-4. **Medication guardrails**
-   - `drugs`, `drug_warnings`, `contraindications`
-5. **Source traceability**
-   - `sources`, `update_history`
+1. scope control
+2. general medical-information grounding
+3. high-risk escalation checks
+4. medication-related guardrails
+5. source traceability
 
-## Recommended source policy
+## Recommended Source Policy
 
-- Prefer structured/public-health sources with clear terms and attribution.
+- Prefer structured public-health or openly licensed sources with clear
+  attribution.
 - Store source metadata and checksums in `sources`.
-- Treat web/general-content sources as lower trust and never as sole basis for urgent guidance.
+- Treat general web content as lower trust and never as the sole basis for
+  urgent or safety-critical guidance.
 
-## Update pipeline (server-controlled)
+## Update Pipeline
 
-1. Build new `guardrails.db` offline from ETL jobs.
-2. Compute SHA-256 for all bundles.
-3. Produce `manifest.json` (same shape as `manifest.example.json`).
-   - the manifest may now include two optional sections that will be
-     consumed by the app:
-     * `policy` – a collection of rules that may be translated into
-       topic‑based allow/deny settings.
-     * `promptPackInline` – contains a `systemPrompt` and example
-       exchanges; this becomes the active guardrails system prompt.
-4. Sign manifest payload digest (`signature`).
-5. Host `manifest.json` + bundles on your server.
-6. App calls `planGuardrailsUpdate(manifestUrl)` and verifies before applying.
-   * the returned `guardrailsPatch` can be merged into the app state
-     automatically; topics and prompts will update immediately even
-     before the database is swapped in.
+1. Build a new guardrails database offline.
+2. Compute SHA-256 digests for bundles.
+3. Produce `manifest.json` following the same shape as
+   `manifest.example.json`.
+4. Optionally include:
+   - `policy` for runtime allow/deny and escalation rules
+   - `promptPackInline` for a versioned research/demo system prompt
+5. Host the manifest and bundles on infrastructure you control.
+6. Call `planGuardrailsUpdate(manifestUrl)` in the app and validate before
+   applying changes.
 
-## Next implementation steps
+## Safety Boundary
 
-1. Add persistent config key for `guardrailsManifestUrl` in app settings.
-2. Add `Check for updates` button to trigger `planGuardrailsUpdate`.
-3. Add bundle download + hash verification + atomic DB swap.
-4. Add runtime guardrail evaluator:
-   - Topic gate
-   - Red-flag escalation
-   - Triage rule evaluation
-   - Medication contraindication checks
+Guardrails in this folder are best-effort runtime controls for a prototype.
+They do not make the app clinically validated, regulator-ready, or safe for
+autonomous healthcare use.

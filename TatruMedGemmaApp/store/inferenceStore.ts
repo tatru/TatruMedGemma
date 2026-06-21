@@ -124,21 +124,21 @@ const createPromptId = () => `prompt-${Math.random().toString(36).slice(2, 10)}`
 const DEFAULT_GUARDRAIL_TOPICS: GuardrailsTopicPolicy[] = [
   {
     id: 'topic-triage',
-    topicName: 'Triage and symptom guidance',
+    topicName: 'Symptom discussion and escalation',
     isAllowed: true,
     enabled: true,
     updatedAt: Date.now(),
   },
   {
     id: 'topic-medication-safety',
-    topicName: 'Medication safety and contraindications',
+    topicName: 'Medication information and contraindication discussion',
     isAllowed: true,
     enabled: true,
     updatedAt: Date.now(),
   },
   {
     id: 'topic-definitive-diagnosis',
-    topicName: 'Definitive diagnosis claims',
+    topicName: 'Definitive diagnosis or clinical claims',
     isAllowed: false,
     enabled: true,
     updatedAt: Date.now(),
@@ -250,13 +250,13 @@ export const useInferenceStore = create<InferenceState>()(
       },
       medsiglip: {
         enabled: false,
-        baseUrl: OLLAMA_BASE_URL,
+        baseUrl: '',
         model: 'google/medsiglip-448',
         analyzePath: '/analyze',
       },
       medasr: {
         enabled: false,
-        baseUrl: OLLAMA_BASE_URL,
+        baseUrl: '',
         model: 'google/medasr',
         transcribePath: '/transcribe',
       },

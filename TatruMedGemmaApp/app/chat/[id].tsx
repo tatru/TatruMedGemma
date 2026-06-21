@@ -220,7 +220,7 @@ export default function ChatScreen() {
     try {
       const analysis = await analyzeImageWithMedsiglip(
         imageUri,
-        'Describe this medical image with key findings and a short impression.'
+        'Describe this medical image for research/demo use, summarize visible features, and avoid diagnosis or treatment claims.'
       );
 
       if (!analysis.trim()) {

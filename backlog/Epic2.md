@@ -1,45 +1,58 @@
-# Epic 2: Core Chat & Offline AI Integration
+# Epic 2: Core Chat And Offline AI Integration
+
+## Archive Note
+
+This is a historical backlog document from the Kaggle challenge period. It
+captures planning language, not current product claims.
 
 ## Overview
-Develop the primary chat interface and integrate a local LLM (e.g., quantized MedGemma) for offline-first capabilities.
+
+Develop the primary chat interface and integrate a local LLM for
+offline-first research/demo experimentation.
 
 ## User Stories
 
 ### US2.1: Implement Chat UI
-**As a** user,
-**I want** a chat interface where I can type messages and receive responses,
-**So that** I can communicate my symptoms clearly.
+
+**As a** user,  
+**I want** a chat interface where I can type messages and receive responses,  
+**So that** I can capture questions and observations clearly.
 
 ### US2.2: Integrate Local LLM (Edge AI)
-**As a** user,
-**I want** the app to process my text locally using a lightweight MedGemma model,
-**So that** I can get immediate advice without an internet connection.
+
+**As a** user,  
+**I want** the app to process my text locally using a lightweight MedGemma
+model,  
+**So that** I can experiment without requiring internet access.
 
 ### US2.3: Manage Chat Sessions/History
-**As a** user,
-**I want** to view a list of my past chat sessions and resume them,
-**So that** I can track the progression of my symptoms.
+
+**As a** user,  
+**I want** to view a list of past chat sessions and resume them,  
+**So that** I can revisit prior prototype conversations.
 
 ### US2.4: Implement Cloud Fallback Logic
-**As a** user,
-**I want** the option to escalate my query to a more powerful online model if the local one is unsure,
-**So that** I get the most accurate medical advice possible.
 
-### US2.5: Quantization & Model Packaging
-**As a** developer,
-**I want** a reproducible notebook/workflow that produces a quantized MedGemma model suitable for mobile inference,
-**So that** the offline mode uses a small, fast model and can be bundled with the app or downloaded at runtime.
+**As a** user,  
+**I want** the option to route a query to a more powerful online model when
+I choose to do so,  
+**So that** I can compare local and hosted prototype behavior.
+
+### US2.5: Quantization And Model Packaging
+
+**As a** developer,  
+**I want** a reproducible workflow that produces a quantized MedGemma model
+suitable for mobile experimentation,  
+**So that** the offline mode can use a small, fast model or user-managed
+download.
 
 ## Progress
 
-- ✅ US2.1 Chat UI implemented in React Native; messages render and user input is stored.
-- ✅ US2.2 Local LLM wired through provider abstraction; current prototype uses LAN Ollama service with the quantized model and offline flag handled in settings.
-- ✅ US2.3 Chat history persists using local storage (async/SQLite) and can be resumed.
-- ✅ US2.4 Cloud fallback logic exists in the inference router; switching happens automatically when LAN is unreachable.
-- 🟡 US2.5 Quantization notebook (`MedGemma v2.ipynb`) produces `quant-medgemma/` artifacts; need to bundle model and add verification in app.
+- Implemented: chat UI, provider abstraction, and local persistence
+- Implemented: local/LAN/cloud routing experiments
+- In progress historically: quantization workflow and model packaging
 
-**Next steps:**
-1. Surface an explicit “offline” inference mode that loads a model packaged with the app or downloaded via Wi‑Fi.
-2. Add integrity checks and size metadata for the quantized model.  
-3. Update documentation/README with offline build instructions (already begun above).
+## Note
 
+Nothing in this file should be read as a claim of diagnostic accuracy,
+clinical safety, or healthcare readiness.

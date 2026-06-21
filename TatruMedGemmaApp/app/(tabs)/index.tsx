@@ -1,5 +1,15 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Alert, View, Text, FlatList, TouchableOpacity, StyleSheet, SafeAreaView, Platform, NativeModules } from 'react-native';
+import {
+  Alert,
+  FlatList,
+  NativeModules,
+  Platform,
+  SafeAreaView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useChatStore } from '../../store/chatStore';
@@ -9,7 +19,11 @@ import {
   getInferenceModeLabel,
 } from '../../services/inference/router';
 import { useInferenceStore } from '../../store/inferenceStore';
-import { clearDeviceModelFiles, downloadDeviceModel, getDeviceModelState } from '../../services/inference/deviceModelService';
+import {
+  clearDeviceModelFiles,
+  downloadDeviceModel,
+  getDeviceModelState,
+} from '../../services/inference/deviceModelService';
 import { MIN_FREE_MEMORY_BYTES } from '../../services/inference/providers/deviceProvider';
 
 export default function HomeScreen() {
@@ -41,9 +55,7 @@ export default function HomeScreen() {
         const modelState = await getDeviceModelState();
         setDeviceModelStatus(modelState.ggufExists ? 'Ready' : 'Not downloaded');
       } else if (active && inferenceMode === 'device' && Platform.OS === 'web') {
-        // web runtime cannot store models locally
-        setDeviceModelStatus('Not available on web'); // keep string same
-
+        setDeviceModelStatus('Not available on web');
       }
     };
 
@@ -71,32 +83,35 @@ export default function HomeScreen() {
   }, []);
 
   const handlePrepareDeviceModel = async () => {
-    // always warn about device requirements and potential OOM/crashes
     const warning =
-      'On-device inference is resource‑intensive. Devices with less than 8 GB of ' +
-      'RAM may almost certainly fail when loading or running the model, potentially terminating ' +
-      'the app with an "Out of memory" error. Downloading the GGUF file does not ' +
-      'guarantee that it can be used successfully. Proceed only if you understand ' +
-      'these risks and believe your phone is capable.';
+      'On-device inference is resource-intensive. Devices with less than 8 GB of RAM ' +
+      'may fail when loading or running the model, potentially terminating the app. ' +
+      'Downloading the GGUF file does not guarantee successful local inference.';
     let proceed = false;
+
     await new Promise<void>((resolve) => {
       Alert.alert('Download warning', warning, [
         { text: 'Cancel', style: 'cancel', onPress: () => resolve() },
-        { text: 'Continue', onPress: () => { proceed = true; resolve(); } },
+        {
+          text: 'Continue',
+          onPress: () => {
+            proceed = true;
+            resolve();
+          },
+        },
       ]);
     });
+
     if (!proceed) {
       return;
     }
 
-    // quick hardware sanity check: total RAM should exceed the threshold
     const pm = (NativeModules as any)?.PlatformConstants;
     const mem = pm?.totalMemory;
     if (typeof mem === 'number' && mem < MIN_FREE_MEMORY_BYTES) {
       Alert.alert(
         'Low RAM detected',
-        `This device reports only ${(mem / (1024 ** 3)).toFixed(1)} GB total RAM, ` +
-          'which is below the recommended 8 GB. Inference may not run and could OOM.',
+        `This device reports only ${(mem / 1024 ** 3).toFixed(1)} GB total RAM, which is below the recommended 8 GB. Inference may not run and could fail.`,
         [{ text: 'OK' }]
       );
     }
@@ -113,7 +128,9 @@ export default function HomeScreen() {
         onProgress: (progress) => {
           const targetLabel = progress.stage === 'mmproj' ? 'mmproj' : 'GGUF';
           const statusLabel =
-            progress.percent != null ? `Downloading ${targetLabel} (${progress.percent}%)` : `Downloading ${targetLabel}`;
+            progress.percent != null
+              ? `Downloading ${targetLabel} (${progress.percent}%)`
+              : `Downloading ${targetLabel}`;
           setDeviceModelStatus(statusLabel);
         },
       });
@@ -194,20 +211,28 @@ export default function HomeScreen() {
   };
 
   const renderItem = ({ item }: { item: ChatSession }) => (
-    <TouchableOpacity 
-      style={styles.card} 
-      onPress={() => router.push(`/chat/${item.id}`)}
-    >
+    <TouchableOpacity style={styles.card} onPress={() => router.push(`/chat/${item.id}`)}>
       <View style={styles.cardContent}>
-        <Ionicons name="chatbubble-ellipses-outline" size={24} color="#007AFF" style={styles.icon} />
+        <Ionicons
+          name="chatbubble-ellipses-outline"
+          size={24}
+          color="#007AFF"
+          style={styles.icon}
+        />
         <View style={styles.textContainer}>
-          <Text style={styles.title} numberOfLines={1}>{item.title}</Text>
+          <Text style={styles.title} numberOfLines={1}>
+            {item.title}
+          </Text>
           <Text style={styles.timestamp}>
-            {new Date(item.lastUpdated).toLocaleDateString()} {new Date(item.lastUpdated).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
+            {new Date(item.lastUpdated).toLocaleDateString()}{' '}
+            {new Date(item.lastUpdated).toLocaleTimeString([], {
+              hour: '2-digit',
+              minute: '2-digit',
+            })}
           </Text>
         </View>
         <TouchableOpacity onPress={(e) => deleteSession(e, item.id)} style={styles.deleteButton}>
-           <Ionicons name="trash-outline" size={20} color="#ff3b30" />
+          <Ionicons name="trash-outline" size={20} color="#ff3b30" />
         </TouchableOpacity>
       </View>
     </TouchableOpacity>
@@ -218,6 +243,9 @@ export default function HomeScreen() {
       <View style={styles.header}>
         <View>
           <Text style={styles.headerTitle}>Tatru MedGemma</Text>
+          <Text style={styles.headerSubtitle}>
+            Research/demo prototype. Outputs require qualified medical review.
+          </Text>
           <Text
             style={[
               styles.connectionStatus,
@@ -226,26 +254,21 @@ export default function HomeScreen() {
                 : providerConnected
                   ? styles.connectionUp
                   : styles.connectionDown,
-            ]}
-          >
+            ]}>
             {providerConnected === null
-              ? `● Checking ${getInferenceModeLabel(inferenceMode)}...`
+              ? `Checking ${getInferenceModeLabel(inferenceMode)}...`
               : providerConnected
-                ? `● ${getInferenceModeLabel(inferenceMode)} connected`
-                : `● ${getInferenceModeLabel(inferenceMode)} offline`}
+                ? `${getInferenceModeLabel(inferenceMode)} connected`
+                : `${getInferenceModeLabel(inferenceMode)} offline`}
           </Text>
-          {inferenceMode === 'lan' && (
-            <Text style={styles.modelStatus}>
-              {`Model: ${lanModel}`}
-            </Text>
-          )}
+          {inferenceMode === 'lan' && <Text style={styles.modelStatus}>{`Model: ${lanModel}`}</Text>}
           {inferenceMode === 'device' && (
-            <Text style={styles.modelStatus}>
-              {`On-device model: ${deviceModelStatus || 'Not downloaded'}`}
-            </Text>
+            <Text style={styles.modelStatus}>{`On-device model: ${deviceModelStatus || 'Not downloaded'}`}</Text>
           )}
           {inferenceMode === 'device' && Platform.OS === 'web' && (
-            <Text style={[styles.modelStatus, { color: '#888' }]}>⚠️ on-device inference not supported in web builds</Text>
+            <Text style={[styles.modelStatus, { color: '#888' }]}>
+              On-device inference is not available in web builds.
+            </Text>
           )}
         </View>
         <View style={styles.headerActions}>
@@ -258,24 +281,23 @@ export default function HomeScreen() {
               <TouchableOpacity
                 onPress={handlePrepareDeviceModel}
                 style={[styles.pullButton, preparingDeviceModel && styles.pullButtonDisabled]}
-                disabled={preparingDeviceModel}
-              >
+                disabled={preparingDeviceModel}>
                 <Ionicons name="cloud-download-outline" size={18} color="#fff" />
-                <Text style={styles.pullButtonText}>{preparingDeviceModel ? 'Downloading...' : 'Download GGUF'}</Text>
+                <Text style={styles.pullButtonText}>
+                  {preparingDeviceModel ? 'Downloading...' : 'Download GGUF'}
+                </Text>
               </TouchableOpacity>
               <TouchableOpacity
                 onPress={handleCancelDeviceModelDownload}
                 style={[styles.cancelButton, !preparingDeviceModel && styles.pullButtonDisabled]}
-                disabled={!preparingDeviceModel}
-              >
+                disabled={!preparingDeviceModel}>
                 <Ionicons name="close-circle-outline" size={18} color="#fff" />
                 <Text style={styles.pullButtonText}>Cancel</Text>
               </TouchableOpacity>
               <TouchableOpacity
                 onPress={handleClearDeviceModel}
                 style={[styles.clearButton, preparingDeviceModel && styles.pullButtonDisabled]}
-                disabled={preparingDeviceModel}
-              >
+                disabled={preparingDeviceModel}>
                 <Ionicons name="trash-outline" size={18} color="#fff" />
                 <Text style={styles.pullButtonText}>Clear files</Text>
               </TouchableOpacity>
@@ -291,9 +313,12 @@ export default function HomeScreen() {
       {sessions.length === 0 ? (
         <View style={styles.emptyState}>
           <Ionicons name="medical-outline" size={64} color="#ccc" />
-          <Text style={styles.emptyText}>Start a new consultation</Text>
+          <Text style={styles.emptyText}>Start a new demo chat</Text>
+          <Text style={styles.emptySubtext}>
+            Do not rely on outputs for diagnosis or treatment.
+          </Text>
           <TouchableOpacity onPress={handleNewChat} style={styles.startButton}>
-            <Text style={styles.startButtonText}>Start Now</Text>
+            <Text style={styles.startButtonText}>Start Chat</Text>
           </TouchableOpacity>
         </View>
       ) : (
@@ -331,6 +356,13 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: 'bold',
     color: '#000',
+  },
+  headerSubtitle: {
+    fontSize: 12,
+    marginTop: 4,
+    color: '#666',
+    maxWidth: 260,
+    lineHeight: 16,
   },
   connectionStatus: {
     fontSize: 12,
@@ -460,6 +492,13 @@ const styles = StyleSheet.create({
     marginTop: 16,
     fontSize: 18,
     color: '#8e8e93',
+  },
+  emptySubtext: {
+    marginTop: 8,
+    fontSize: 13,
+    color: '#8e8e93',
+    textAlign: 'center',
+    paddingHorizontal: 32,
   },
   startButton: {
     marginTop: 24,

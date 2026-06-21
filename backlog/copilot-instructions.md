@@ -1,48 +1,61 @@
-# Copilot Instructions for GemmaMed-Help
+# Copilot Instructions For GemmaMed-Help
+
+## Archive Note
+
+This file is a historical challenge-era planning note. It describes early
+prototype ideas and naming, not the current public positioning of the
+repository. TatruMedGemma remains a research/demo prototype and must not be
+interpreted as a medical device, diagnostic tool, or emergency response
+system.
 
 ## Project Overview
-This project is a React Native mobile application built with Expo for the "MedGemma Impact Challenge". The app, tentatively named "GemmaMed-Help", is designed to be a first-step triage tool for users unsure if their symptoms warrant a doctor's visit, thereby reducing congestion in healthcare systems.
+
+This project is a React Native mobile application built with Expo for the
+MedGemma Impact Challenge. The app concept explored a privacy-aware,
+medical-adjacent assistant that could discuss symptoms, images, and care
+escalation in a research/demo setting.
 
 ## Core Technologies
-- **Framework:** React Native with Expo (Managed Workflow preferred).
-- **Language:** TypeScript.
-- **AI/ML:** 
-    - **Local/Edge AI:** Integration of smaller, quantized versions of MedGemma (or similar HAI-DEF models) for offline-first capabilities.
-    - **Cloud AI:** Fallback to larger, server-side MedGemma models for complex cases when online.
-- **Navigation:** React Navigation (Stack/Tabs).
-- **State Management:** (To be decided, e.g., Zustand/Redux Toolkit/Context API - default to Context/Zustand for simplicity initially).
-- **Storage:** Local storage for chat history/images (e.g., MMKV, AsyncStorage, or SQLite).
-- **Media:** Expo Camera, Expo Image Picker, Expo AV (Audio).
 
-## Key Features & Requirements
-1.  **Chat Interface:** A conversational UI similar to standard messaging apps.
-    -   Support for text input.
-    -   Support for voice input (Speech-to-Text).
-    -   Support for image input (Camera/Gallery).
-    -   Historical chat tracking (locally stored/retrievable).
-2.  **Offline-First Architecture:** The app must function initially without internet, using an on-device LLM.
-3.  **Medical Triage/Advice:**
-    -   Analyze inputs (symptoms, images) to provide "pre-diagnostic" guidance.
-    -   Advice on whether to visit a doctor, urgent care, or ER.
-    -   Capability to generate a summary/report for sharing with healthcare providers.
-4.  **Emergency Features:**
-    -   Quick access to local emergency services.
-    -   Geolocation (GPS) sharing for emergency response.
-    -   Text-to-Speech (TTS) for making emergency calls on behalf of the user (Advanced/Future Scope).
+- **Framework:** React Native with Expo
+- **Language:** TypeScript
+- **AI/ML:**
+  - **Local/Edge AI:** smaller, quantized MedGemma-style models for local
+    experimentation
+  - **Cloud AI:** hosted fallback models for optional online experimentation
+- **Navigation:** React Navigation
+- **State management:** local app state such as Zustand or similar
+- **Storage:** local storage for chat history, settings, and model metadata
+- **Media:** camera, image picker, and optional audio tooling
+
+## Historical Feature Concepts
+
+1. **Chat interface**
+   - text input
+   - voice input
+   - image input
+   - locally stored chat history
+2. **Offline-first architecture**
+   - initial support for local or edge inference
+3. **Symptom discussion and escalation**
+   - exploratory educational output only
+   - suggestions to seek qualified human care when appropriate
+   - optional summary generation for user review and sharing
+4. **Emergency-related ideas**
+   - these were challenge-era brainstorm items only
+   - they should not be interpreted as current or approved product behavior
 
 ## Coding Standards
--   Use functional components and Hooks.
--   Follow TypeScript best practices (strict typing).
--   Use Expo libraries whenever possible.
--   Prioritize accessibility and clear UI/UX for potentially distressed users.
--   Ensure privacy and data security (local-first data handling).
 
-## Competition Specifics
--   Target Track: **The Edge AI Prize** (running effectively on local devices).
--   Must use **MedGemma** or **HAI-DEF** models.
--   No notebook submission required (app code + writeup + video).
+- Use functional components and hooks.
+- Follow TypeScript best practices.
+- Prefer Expo libraries when practical.
+- Prioritize accessible UI.
+- Preserve privacy and safety boundaries appropriate for a research/demo
+  prototype.
 
-## Workflow
--   Development is organized by Epics in the `backlog/` folder.
--   Each Epic contains specific User Stories.
--   Focus on MVP features first: Text chat, Offline Local LLM.
+## Competition Context
+
+- Target track: **The Edge AI Prize**
+- Challenge-era requirement: use **MedGemma** or **HAI-DEF** models
+- Development was organized by epics in the `backlog/` folder

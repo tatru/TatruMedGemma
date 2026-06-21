@@ -1,6 +1,6 @@
 import { Platform } from 'react-native';
 
-const DEFAULT_LAN_OLLAMA_URL = 'http://192.168.50.209:11434';
+const DEFAULT_LAN_OLLAMA_URL = 'http://127.0.0.1:11434';
 
 export type InferenceMode = 'device' | 'lan' | 'cloud' | 'flask' | 'kaggle';
 
@@ -31,7 +31,7 @@ export const DEVICE_MMPROJ_URL =
   'https://huggingface.co/unsloth/medgemma-4b-it-GGUF/resolve/main/mmproj-F16.gguf';
 export const OLLAMA_SYSTEM_PROMPT =
   process.env.EXPO_PUBLIC_OLLAMA_SYSTEM_PROMPT?.trim() ||
-  'You are a medical assistant powered by MedGemma. Give clear, concise, safe guidance and suggest seeking licensed clinical care when uncertainty or risk is high.';
+  'You are an experimental medical information assistant prototype powered by MedGemma. Provide general educational information, state uncertainty clearly, avoid diagnosis, treatment, prescribing, or emergency triage instructions, and direct users to qualified medical professionals for review.';
 
 const resolveDefaultInferenceMode = (): InferenceMode => {
   const configured = process.env.EXPO_PUBLIC_INFERENCE_MODE?.trim().toLowerCase();
@@ -50,8 +50,8 @@ const resolveDefaultInferenceMode = (): InferenceMode => {
 export const DEFAULT_INFERENCE_MODE = resolveDefaultInferenceMode();
 
 export const CLOUD_BASE_URL =
-  process.env.EXPO_PUBLIC_CLOUD_BASE_URL?.trim() || 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent';
-export const CLOUD_MODEL = process.env.EXPO_PUBLIC_CLOUD_MODEL?.trim() || 'gemini-2.5-flash';
+  process.env.EXPO_PUBLIC_CLOUD_BASE_URL?.trim() || '';
+export const CLOUD_MODEL = process.env.EXPO_PUBLIC_CLOUD_MODEL?.trim() || '';
 export const CLOUD_API_KEY = process.env.EXPO_PUBLIC_CLOUD_API_KEY?.trim() || '';
 export const CLOUD_SYSTEM_PROMPT =
   process.env.EXPO_PUBLIC_CLOUD_SYSTEM_PROMPT?.trim() || OLLAMA_SYSTEM_PROMPT;
@@ -62,7 +62,7 @@ export const GUARDRAILS_MANIFEST_URL =
 
 // Kaggle Spaces Gradio endpoint, e.g. https://abc123.gradio.live
 export const KAGGLE_GRADIO_URL =
-  process.env.EXPO_PUBLIC_KAGGLE_GRADIO_URL?.trim() || 'https://0f9900aa8f37a62d2e.gradio.live';
+  process.env.EXPO_PUBLIC_KAGGLE_GRADIO_URL?.trim() || '';
 
 // Tuned defaults used by the device provider when the user hasn't overridden them.
 export const DEVICE_N_CTX = 768;
