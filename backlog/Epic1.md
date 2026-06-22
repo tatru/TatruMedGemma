@@ -1,7 +1,7 @@
 # Epic 1: Project Setup and Infrastructure
 
 ## Overview
-Establish the foundational structure of the React Native Expo application, including navigation, state management, and local storage.
+Establish the foundational structure of the React Native Expo application, including navigation, state management, and local persistence.
 
 ## User Stories
 
@@ -22,19 +22,18 @@ Establish the foundational structure of the React Native Expo application, inclu
 
 ### US1.4: Define Basic UI/Theme
 **As a** user,
-**I want** a clean, calming, and accessible interface (e.g., medical-friendly colors),
-**So that** I feel reassured while using the app in stressful situations.
+**I want** a clean, consistent, and accessible interface,
+**So that** I can use the prototype without unnecessary UI friction.
 
-### US1.5: Improve the manifest file processing so it can containt the guardrails and the system instructions, and the guardrails can be used to control the behavior of the assistant.
+### US1.5: Improve manifest processing so it can contain guardrails and system instructions, and those settings can influence assistant behavior
 **As a** developer,
 **I want** to enhance the manifest file to include guardrails and system instructions,
-**So that** I can control the behavior of the assistant more effectively and ensure it adheres to the desired guidelines with full transparency in the public github repository.
+**So that** I can control the behavior of the assistant more effectively and keep those controls transparent in the public repository.
 
 ## Progress
 
-- ✅ US1.1: Project created with Expo/TypeScript; codebase lives in `TatruMedGemmaApp/`.
-- ✅ US1.2: Navigation stack and tab layout implemented (`app/(tabs)` folder).
-- ✅ US1.3: Async storage/SQLite is used for persisting chat sessions and settings.
-- ✅ US1.4: Theme constants defined, and UI components follow neutral medical palette.
-- ✅ US1.5: Manifest file structure updated to include guardrails and system instructions; update service scaffolded to process these new fields.
-
+- Done: US1.1. Project created with Expo/TypeScript; codebase lives in `TatruMedGemmaApp/`.
+- Done: US1.2. Navigation stack and tab layout are implemented.
+- Done: US1.3. Chat sessions and inference settings persist locally via Zustand plus `AsyncStorage`. SQLite assets exist for guardrails/update scaffolding, but SQLite is not the primary runtime store for app state.
+- Done: US1.4. Theme constants and shared UI components are in place. The current visual system is consistent and usable, but still prototype-grade rather than a polished design system.
+- Partial: US1.5. Guardrails/system-instruction fields, prompt templates, and manifest update plumbing are present. Runtime behavior is influenced by stored prompt and guardrails configuration, but this remains a lightweight prototype implementation.
